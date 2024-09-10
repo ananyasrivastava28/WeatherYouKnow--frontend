@@ -9,7 +9,7 @@ const WeatherDetails = ({ city_name }) => {
     const fetchWeather = async () => {
         console.log('component called!!')
       try {
-        const response = await axios.get(`http://localhost:8000/user/${city_name}`);
+        const response = await axios.get(`https://weatheryouknow-backend.onrender.com/user/${city_name}`);
         setWeatherData(response.data);
       } catch (error) {
         console.error('Error fetching weather:', error.message);
