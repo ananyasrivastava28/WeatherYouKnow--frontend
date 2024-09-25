@@ -1,6 +1,6 @@
 .parent-container {
   text-align: center;
-  height: 100vh;
+
 }
 
 input[type="text"] {
@@ -15,10 +15,10 @@ button[type="submit"] {
   color: white;
   border: none;
   border-radius: 5px;
-  cursor:   
- pointer;
+  cursor: pointer;
+  margin-left: 10px;
 }
 
 .input-field{
-  padding: 20px;
+  padding: 5px;
 }

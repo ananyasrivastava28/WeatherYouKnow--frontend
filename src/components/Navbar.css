@@ -1,0 +1,32 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(28, 144, 226, 0.7); /* Translucent version of #4a90e2 */
+  padding: 1rem 2rem;
+  height: 10vh;
+}
+
+.logo img {
+  height: 80px; /* Adjust the size of your logo */
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 2rem; /* Space between links */
+}
+
+.nav-links li {
+  display: inline;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: white; /* Link color */
+  font-weight: bold;
+}
+
+.nav-links a:hover {
+  text-decoration: underline; /* Underline on hover */
+}
