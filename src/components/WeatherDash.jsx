@@ -1,45 +1,81 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import '../components/weatherDash.css';
 
 // Define image paths for different weather codes
 const images = {
-  800: '/images/clear sky 800.jpg', // Clear Sky
-  300: '/images/drizzle 300.jpg', // Drizzle
-  803: '/images/broken cloud 803.jpg', // Broken Clouds
-  801: '/images/few cloud 801.jpg', // Few Clouds
-  600: '/images/snow 600.jpg', // Snow
-  200: '/images/Thunderstorm 200.jpg', // Thunderstorm
-  741: '/images/fog 741.jpg',
+  800: '/images/clear_sky_800.jpg', // Clear Sky
+  300: '/images/drizzle_300.jpg', // Drizzle
+  803: '/images/broken_cloud_803.jpg', // Broken Clouds
+  801: '/images/few_cloud_801.jpg', // Few Clouds
+  600: '/images/snow_600.jpg', // Snow
+  200: '/images/Thunderstorm_200.jpg', // Thunderstorm
+  741: '/images/fog_741.jpg', // fog
+  721: '/images/Haze_721.jpg', // Haze
   others: '/images/others.jpg', // For all other weather codes
 };
 
 const WeatherDetails = ({ city_name }) => {
   const [weatherData, setWeatherData] = useState(null);
 
+  // Memoized function to get cached data
+  const getCachedData = useMemo(() => {
+    return (cityName) => {
+      const cachedData = localStorage.getItem(`weather_${cityName}`);
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        // Check if cache is less than 5 minutes old
+        if (Date.now() - timestamp < 5 * 60 * 1000) {
+          return data;
+        }
+      }
+      return null;
+    };
+  }, []);
+
+  // Memoized function to set cached data
+  const setCachedData = useMemo(() => {
+    return (cityName, data) => {
+      localStorage.setItem(
+        `weather_${cityName}`,
+        JSON.stringify({
+          data,
+          timestamp: Date.now(),
+        })
+      );
+    };
+  }, []);
+
   useEffect(() => {
     const fetchWeather = async () => {
-      console.log('component called!!');
+      // Check cache first
+      const cachedData = getCachedData(city_name);
+      if (cachedData) {
+        console.log('Using cached data for:', city_name);
+        setWeatherData(cachedData);
+        return;
+      }
+
+      console.log('Fetching new data for:', city_name);
       try {
         const response = await axios.get(`https://weatheryouknow-backend.onrender.com/user/${city_name}`);
         setWeatherData(response.data);
+        // Cache the new data
+        setCachedData(city_name, response.data);
       } catch (error) {
         console.error('Error fetching weather:', error.message);
       }
     };
 
     fetchWeather();
-  }, [city_name]);
+  }, [city_name, getCachedData, setCachedData]);
 
   if (!weatherData) {
     return <div>Loading...</div>;
   }
 
   const { description, cityName, countryCode, timeZone, dateTime, weatherCode } = weatherData;
-  console.log(weatherCode);
-  // Determine the appropriate background image based on the weather code
   const imageSrc = images[weatherCode] || images.others;
-  console.log(`Selected image: ${imageSrc}`);
 
   return (
     <div
@@ -48,7 +84,6 @@ const WeatherDetails = ({ city_name }) => {
         backgroundImage: `url(${imageSrc})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        
       }}
     >
       <div className="weather-details-content">
